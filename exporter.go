@@ -14,8 +14,10 @@ import (
 )
 
 const (
-	mbeansPath     = "/admin/mbeans?stats=true&wt=json&cat=CORE&cat=QUERY&cat=UPDATE&cat=CACHE"
-	adminCoresPath = "/admin/cores?action=STATUS&wt=json"
+	mbeansPath        = "/admin/mbeans?stats=true&wt=json&cat=CORE&cat=QUERY&cat=UPDATE&cat=CACHE"
+	adminCoresPath    = "/admin/cores?action=STATUS&wt=json"
+	metricsCorePath   = "/admin/metrics?group=core&prefix=QUERY,UPDATE&wt=json"
+	updateMetricsPath = "/admin/metrics?group=core&prefix=QUERY,UPDATE&wt=json"
 )
 
 var (
@@ -39,31 +41,43 @@ var (
 		"999th_pc_request_time":      "999th_pc_request_time",
 		"avg_requests_per_second":    "avg_requests_per_second",
 		"avg_time_per_request":       "avg_time_per_request",
-		"errors":                     "errors",
-		"handler_start":              "handler_start",
 		"median_request_time":        "median_request_time",
 		"requests":                   "requests",
+		"errors":                     "errors",
+		"client_errors":              "client_errors",
+		"server_errors":              "server_errors",
+		"handler_start":              "handler_start",
 		"timeouts":                   "timeouts",
 		"total_time":                 "total_time",
 	}
 	gaugeUpdateMetrics = map[string]string{
-		"adds":                        "adds",
-		"autocommit_max_docs":         "autocommit_max_docs",
-		"autocommit_max_time":         "autocommit_max_time",
-		"autocommits":                 "autocommits",
-		"commits":                     "commits",
-		"cumulative_adds":             "cumulative_adds",
-		"cumulative_deletes_by_id":    "cumulative_deletes_by_id",
-		"cumulative_deletes_by_query": "cumulative_deletes_by_query",
-		"cumulative_errors":           "cumulative_errors",
-		"deletes_by_id":               "deletes_by_id",
-		"deletes_by_query":            "deletes_by_query",
-		"docs_pending":                "docs_pending",
-		"errors":                      "errors",
-		"expunge_deletes":             "expunge_deletes",
-		"optimizes":                   "optimizes",
-		"rollbacks":                   "rollbacks",
-		"soft_autocommits":            "soft_autocommits",
+		"15min_rate_updates_per_second": "15min_rate_updates_per_second",
+		"5min_rate_updates_per_second":  "5min_rate_updates_per_second",
+		"75th_pc_update_time":           "75th_pc_update_time",
+		"95th_pc_update_time":           "95th_pc_update_time",
+		"99th_pc_update_time":           "99th_pc_update_time",
+		"999th_pc_update_time":          "999th_pc_update_time",
+		"avg_updates_per_second":        "avg_updates_per_second",
+		"avg_time_per_update":           "avg_time_per_update",
+		"requests":                      "requests",
+		"adds":                          "adds",
+		"autocommit_max_docs":           "autocommit_max_docs",
+		"autocommit_max_time":           "autocommit_max_time",
+		"autocommits":                   "autocommits",
+		"commits":                       "commits",
+		"cumulative_adds":               "cumulative_adds",
+		"cumulative_deletes_by_id":      "cumulative_deletes_by_id",
+		"cumulative_deletes_by_query":   "cumulative_deletes_by_query",
+		"cumulative_errors":             "cumulative_errors",
+		"deletes_by_id":                 "deletes_by_id",
+		"deletes_by_query":              "deletes_by_query",
+		"docs_pending":                  "docs_pending",
+		"errors":                        "errors",
+		"expunge_deletes":               "expunge_deletes",
+		"merges":                        "merges",
+		"optimizes":                     "optimizes",
+		"rollbacks":                     "rollbacks",
+		"soft_autocommits":              "soft_autocommits",
 	}
 	gaugeCacheMetrics = map[string]string{
 		"cumulative_evictions": "cumulative_evictions",
@@ -93,9 +107,11 @@ func getCoresFromStatus(adminCoresStatus *AdminCoresStatus) []string {
 // Exporter collects Solr stats from the given server and exports
 // them using the prometheus metrics package.
 type Exporter struct {
-	mBeansURL    string
-	AdminCoreURL string
-	mutex        sync.RWMutex
+	mBeansURL        string
+	adminCoreURL     string
+	metricsURL       string
+	updateMetricsURL string
+	mutex        		 sync.RWMutex
 
 	up prometheus.Gauge
 
@@ -155,13 +171,17 @@ func NewExporter(solrBaseURL string, timeout time.Duration, solrExcludedCore str
 		}, []string{"core", "handler", "class"})
 	}
 
-	mBeansURL := fmt.Sprintf("%s%s%s", solrBaseURL, "%s", mbeansPath)
-	AdminCoreURL := fmt.Sprintf("%s%s", solrBaseURL, adminCoresPath)
+	mBeansURL        := fmt.Sprintf("%s%s%s", solrBaseURL, "%s", mbeansPath)
+	adminCoreURL     := fmt.Sprintf("%s%s", solrBaseURL, adminCoresPath)
+	metricsURL       := fmt.Sprintf("%s%s", solrBaseURL, metricsCorePath)
+	updateMetricsURL := fmt.Sprintf("%s%s", solrBaseURL, metricsCorePath)
 
 	// Init our exporter.
 	return &Exporter{
-		mBeansURL:    mBeansURL,
-		AdminCoreURL: AdminCoreURL,
+		mBeansURL:        mBeansURL,
+		adminCoreURL:     adminCoreURL,
+		metricsURL:       metricsURL,
+		updateMetricsURL: updateMetricsURL,
 
 		up: prometheus.NewGauge(prometheus.GaugeOpts{
 			Namespace: namespace,
@@ -227,7 +247,7 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 	e.up.Set(0)
 	defer func() { ch <- e.up }()
 
-	resp, err := e.client.Get(e.AdminCoreURL)
+	resp, err := e.client.Get(e.adminCoreURL)
 	if err != nil {
 		log.Errorf("Error while querying Solr for admin stats: %v", err)
 		return
@@ -262,25 +282,72 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 
 	cores := getCoresFromStatus(adminCoresStatus)
 
+	metricsResp, err := e.client.Get(e.metricsURL)
+	if err != nil {
+		log.Errorf("Error while querying Solr for metrics: %v", err)
+		return
+	}
+
+	if metricsResp.StatusCode != http.StatusOK {
+		log.Errorf("solr: API responded with status-code %d, expected %d, url %s",
+			metricsResp.StatusCode, http.StatusOK, e.metricsURL)
+		return
+	}
+
+	metricsBody, err := ioutil.ReadAll(metricsResp.Body)
+	if err != nil {
+		log.Errorf("Failed to read Solr metrics response body: %v", err)
+		return
+	}
+
+
+	updateMetricsResp, err := e.client.Get(e.updateMetricsURL)
+	if err != nil {
+		log.Errorf("Error while querying Solr for metrics: %v", err)
+		return
+	}
+
+	if updateMetricsResp.StatusCode != http.StatusOK {
+		log.Errorf("solr: API responded with status-code %d, expected %d, url %s",
+			metricsResp.StatusCode, http.StatusOK, e.updateMetricsURL)
+		return
+	}
+
+	updateBody, err := ioutil.ReadAll(updateMetricsResp.Body)
+	if err != nil {
+		log.Errorf("Failed to read Solr metrics response body: %v", err)
+		return
+	}
+
 	for _, coreName := range cores {
 		if solrExcludedCoreString != "" && regexExludedCore.MatchString(coreName) {
 			continue
 		}
 		mBeansURL := fmt.Sprintf(e.mBeansURL, "/"+coreName)
-		resp, err := e.client.Get(mBeansURL)
+		mBeansURLResp, err := e.client.Get(mBeansURL)
 		if err != nil {
 			log.Errorf("Error while querying Solr for mbeans stats: %v", err)
 			return
 		}
-		defer resp.Body.Close()
+		defer mBeansURLResp.Body.Close()
 
-		if resp.StatusCode != http.StatusOK {
+		if mBeansURLResp.StatusCode != http.StatusOK {
 			log.Errorf("solr: API responded with status-code %d, expected %d, url %s",
-				resp.StatusCode, http.StatusOK, mBeansURL)
+				mBeansURLResp.StatusCode, http.StatusOK, mBeansURL)
 			return
 		}
 
-		errors := processMbeans(e, coreName, resp.Body)
+		errors := processMbeans(e, coreName, mBeansURLResp.Body)
+		for _, err := range errors {
+			log.Error(err)
+		}
+
+		errors = processQueryMetrics(e, coreName, metricsBody)
+		for _, err := range errors {
+			log.Error(err)
+		}
+
+		errors = processUpdateMetrics(e, coreName, updateBody)
 		for _, err := range errors {
 			log.Error(err)
 		}

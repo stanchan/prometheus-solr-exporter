@@ -10,16 +10,19 @@ do
         echo "Solr is unavailable - sleeping"
         sleep 1
     done
-    echo "Solr $j ready !"
+    echo "Solr $j ready!"
     sleep 2
     docker exec -ti solr-$j bin/solr create_core -c gettingstarted
     sleep 2
     until $(curl --output /dev/null --silent --head --fail "http://localhost:8983/solr/gettingstarted/admin/mbeans?stats=true&wt=json&cat=CORE&cat=QUERYHANDLER&cat=UPDATEHANDLER&cat=CACHE"); do
-        echo "Core gettingstated stats are unavailable - sleeping"
+        echo "Core gettingstarted stats are unavailable - sleeping"
         sleep 1
     done
     mkdir generated-json/$j || true
+
+    if
     curl -o generated-json/$j/admin-cores.json --silent --fail "http://localhost:8983/solr/admin/cores?action=STATUS&wt=json"
     curl -o generated-json/$j/mbeans.json --silent --fail "http://localhost:8983/solr/gettingstarted/admin/mbeans?stats=true&wt=json&cat=CORE&cat=QUERYHANDLER&cat=UPDATEHANDLER&cat=CACHE"
+    curl -o generated-json/$j/metrics.json --silent --fail "http://localhost:8983/solr/admin/mbeans?stats=true&wt=json&cat=CORE&cat=QUERYHANDLER&cat=UPDATEHANDLER&cat=CACHE"
     docker stop solr-$j
 done
