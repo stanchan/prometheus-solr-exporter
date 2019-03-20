@@ -17,7 +17,6 @@ const (
 	mbeansPath        = "/admin/mbeans?stats=true&wt=json&cat=CORE&cat=QUERY&cat=UPDATE&cat=CACHE"
 	adminCoresPath    = "/admin/cores?action=STATUS&wt=json"
 	metricsCorePath   = "/admin/metrics?group=core&prefix=QUERY,UPDATE&wt=json"
-	updateMetricsPath = "/admin/metrics?group=core&prefix=QUERY,UPDATE&wt=json"
 )
 
 var (
@@ -41,7 +40,7 @@ var (
 		"999th_pc_request_time":      "999th_pc_request_time",
 		"avg_requests_per_second":    "avg_requests_per_second",
 		"avg_time_per_request":       "avg_time_per_request",
-		"median_request_time":        "median_request_time",
+		"median_time_per_request":    "median_time_per_request",
 		"requests":                   "requests",
 		"errors":                     "errors",
 		"client_errors":              "client_errors",
@@ -59,6 +58,7 @@ var (
 		"999th_pc_update_time":          "999th_pc_update_time",
 		"avg_updates_per_second":        "avg_updates_per_second",
 		"avg_time_per_update":           "avg_time_per_update",
+		"median_time_per_update":        "median_time_per_update",
 		"requests":                      "requests",
 		"adds":                          "adds",
 		"autocommit_max_docs":           "autocommit_max_docs",
@@ -110,7 +110,6 @@ type Exporter struct {
 	mBeansURL        string
 	adminCoreURL     string
 	metricsURL       string
-	updateMetricsURL string
 	mutex        		 sync.RWMutex
 
 	up prometheus.Gauge
@@ -174,14 +173,12 @@ func NewExporter(solrBaseURL string, timeout time.Duration, solrExcludedCore str
 	mBeansURL        := fmt.Sprintf("%s%s%s", solrBaseURL, "%s", mbeansPath)
 	adminCoreURL     := fmt.Sprintf("%s%s", solrBaseURL, adminCoresPath)
 	metricsURL       := fmt.Sprintf("%s%s", solrBaseURL, metricsCorePath)
-	updateMetricsURL := fmt.Sprintf("%s%s", solrBaseURL, metricsCorePath)
 
 	// Init our exporter.
 	return &Exporter{
 		mBeansURL:        mBeansURL,
 		adminCoreURL:     adminCoreURL,
 		metricsURL:       metricsURL,
-		updateMetricsURL: updateMetricsURL,
 
 		up: prometheus.NewGauge(prometheus.GaugeOpts{
 			Namespace: namespace,
@@ -287,6 +284,7 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 		log.Errorf("Error while querying Solr for metrics: %v", err)
 		return
 	}
+	defer metricsResp.Body.Close()
 
 	if metricsResp.StatusCode != http.StatusOK {
 		log.Errorf("solr: API responded with status-code %d, expected %d, url %s",
@@ -295,25 +293,6 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 	}
 
 	metricsBody, err := ioutil.ReadAll(metricsResp.Body)
-	if err != nil {
-		log.Errorf("Failed to read Solr metrics response body: %v", err)
-		return
-	}
-
-
-	updateMetricsResp, err := e.client.Get(e.updateMetricsURL)
-	if err != nil {
-		log.Errorf("Error while querying Solr for metrics: %v", err)
-		return
-	}
-
-	if updateMetricsResp.StatusCode != http.StatusOK {
-		log.Errorf("solr: API responded with status-code %d, expected %d, url %s",
-			metricsResp.StatusCode, http.StatusOK, e.updateMetricsURL)
-		return
-	}
-
-	updateBody, err := ioutil.ReadAll(updateMetricsResp.Body)
 	if err != nil {
 		log.Errorf("Failed to read Solr metrics response body: %v", err)
 		return
@@ -347,7 +326,7 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 			log.Error(err)
 		}
 
-		errors = processUpdateMetrics(e, coreName, updateBody)
+		errors = processUpdateMetrics(e, coreName, metricsBody)
 		for _, err := range errors {
 			log.Error(err)
 		}

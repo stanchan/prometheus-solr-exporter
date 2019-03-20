@@ -1,99 +1,34 @@
 {
-  "responseHeader":{
-    "status":0,
-    "QTime":0},
-  "initFailures":{},
-  "status":{
-    "logs_shard1_replica_n2":{
-      "name":"logs_shard1_replica_n2",
-      "instanceDir":"/data/solr/logs_shard1_replica_n2",
-      "dataDir":"/data/solr/logs_shard1_replica_n2/data/",
-      "config":"solrconfig.xml",
-      "schema":"managed-schema",
-      "startTime":"2019-03-07T08:21:08.887Z",
-      "uptime":29252073,
-      "lastPublished":"active",
-      "configVersion":0,
-      "cloud":{
-        "collection":"logs",
-        "shard":"shard1",
-        "replica":"core_node6"},
-      "index":{
-        "numDocs":0,
-        "maxDoc":0,
-        "deletedDocs":0,
-        "indexHeapUsageBytes":0,
-        "version":2,
-        "segmentCount":0,
-        "current":true,
-        "hasDeletions":false,
-        "directory":"org.apache.lucene.store.NRTCachingDirectory:NRTCachingDirectory(MMapDirectory@/data/solr/logs_shard1_replica_n2/data/index lockFactory=org.apache.lucene.store.NativeFSLockFactory@73ee095c; maxCacheMB=48.0 maxMergeSizeMB=4.0)",
-        "segmentsFile":"segments_1",
-        "segmentsFileSizeInBytes":69,
-        "userData":{},
-        "sizeInBytes":69,
-        "size":"69 bytes"}},
-    "shift_shard1_replica_n2":{
-      "name":"shift_shard1_replica_n2",
-      "instanceDir":"/data/solr/shift_shard1_replica_n2",
-      "dataDir":"/data/solr/shift_shard1_replica_n2/data/",
-      "config":"solrconfig.xml",
-      "schema":"managed-schema",
-      "startTime":"2019-03-07T08:21:08.890Z",
-      "uptime":29252070,
-      "lastPublished":"active",
-      "configVersion":0,
-      "cloud":{
-        "collection":"shift",
-        "shard":"shard1",
-        "replica":"core_node5"},
-      "index":{
-        "numDocs":14,
-        "maxDoc":14,
-        "deletedDocs":0,
-        "indexHeapUsageBytes":-1,
-        "version":6,
-        "segmentCount":1,
-        "current":true,
-        "hasDeletions":false,
-        "directory":"org.apache.lucene.store.NRTCachingDirectory:NRTCachingDirectory(MMapDirectory@/data/solr/shift_shard1_replica_n2/data/index lockFactory=org.apache.lucene.store.NativeFSLockFactory@73ee095c; maxCacheMB=48.0 maxMergeSizeMB=4.0)",
-        "segmentsFile":"segments_2",
-        "segmentsFileSizeInBytes":203,
-        "userData":{
-          "commitTimeMSec":"1551999506256",
-          "commitCommandVer":"1627389434270842880"},
-        "lastModified":"2019-03-07T22:58:26.256Z",
-        "sizeInBytes":5266,
-        "size":"5.14 KB"}},
-    "shift_shard3_replica_n8":{
-      "name":"shift_shard3_replica_n8",
-      "instanceDir":"/data/solr/shift_shard3_replica_n8",
-      "dataDir":"/data/solr/shift_shard3_replica_n8/data/",
-      "config":"solrconfig.xml",
-      "schema":"managed-schema",
-      "startTime":"2019-03-07T08:21:08.891Z",
-      "uptime":29252070,
-      "lastPublished":"active",
-      "configVersion":0,
-      "cloud":{
-        "collection":"shift",
-        "shard":"shard3",
-        "replica":"core_node11"},
-      "index":{
-        "numDocs":8,
-        "maxDoc":8,
-        "deletedDocs":0,
-        "indexHeapUsageBytes":-1,
-        "version":6,
-        "segmentCount":1,
-        "current":true,
-        "hasDeletions":false,
-        "directory":"org.apache.lucene.store.NRTCachingDirectory:NRTCachingDirectory(MMapDirectory@/data/solr/shift_shard3_replica_n8/data/index lockFactory=org.apache.lucene.store.NativeFSLockFactory@73ee095c; maxCacheMB=48.0 maxMergeSizeMB=4.0)",
-        "segmentsFile":"segments_2",
-        "segmentsFileSizeInBytes":203,
-        "userData":{
-          "commitTimeMSec":"1551999505678",
-          "commitCommandVer":"1627389433640648704"},
-        "lastModified":"2019-03-07T22:58:25.678Z",
-        "sizeInBytes":4588,
-        "size":"4.48 KB"}}}}
+    "responseHeader": {
+        "status": 0,
+        "QTime": 6
+    },
+    "initFailures": {},
+    "status": {
+        "gettingstarted": {
+            "name": "gettingstarted",
+            "instanceDir": "/opt/solr/server/solr/gettingstarted",
+            "dataDir": "/opt/solr/server/solr/gettingstarted/data/",
+            "config": "solrconfig.xml",
+            "schema": "managed-schema",
+            "startTime": "2019-03-19T19:43:59.790Z",
+            "uptime": 3085,
+            "index": {
+                "numDocs": 0,
+                "maxDoc": 0,
+                "deletedDocs": 0,
+                "indexHeapUsageBytes": 0,
+                "version": 2,
+                "segmentCount": 0,
+                "current": true,
+                "hasDeletions": false,
+                "directory": "org.apache.lucene.store.NRTCachingDirectory:NRTCachingDirectory(MMapDirectory@/opt/solr/server/solr/gettingstarted/data/index lockFactory=org.apache.lucene.store.NativeFSLockFactory@415e52a2; maxCacheMB=48.0 maxMergeSizeMB=4.0)",
+                "segmentsFile": "segments_1",
+                "segmentsFileSizeInBytes": 69,
+                "userData": {},
+                "sizeInBytes": 69,
+                "size": "69 bytes"
+            }
+        }
+    }
+}

@@ -1,11 +1,9 @@
 package main
 
 import (
-	"encoding/binary"
 	"fmt"
-	"github.com/buger/jsonparser"
-	"math"
 	"regexp"
+	"github.com/buger/jsonparser"
 )
 
 func getCoreAttributes(regExp, coreString string) (coreAttributes map[string]string) {
@@ -20,12 +18,6 @@ func getCoreAttributes(regExp, coreString string) (coreAttributes map[string]str
 		}
 	}
 	return coreAttributes
-}
-
-func bytesToFloat64(bytes []byte) float64 {
-	bits := binary.LittleEndian.Uint64(bytes)
-	float := math.Float64frombits(bits)
-	return float
 }
 
 func processQueryMetrics(e *Exporter, coreName string, data []byte) []error {
@@ -88,50 +80,47 @@ func processQueryMetrics(e *Exporter, coreName string, data []byte) []error {
 			queryValues["avg_time_per_request"] = v
 		case 8:
 			v, _ := jsonparser.ParseFloat(value)
-			queryValues["median_ms"] = v
+			queryValues["median_time_per_request"] = v
 		case 9:
 			v, _ := jsonparser.ParseFloat(value)
-			queryValues["median_request_time"] = v
+			queryValues["requests"] = v
 		case 10:
 			v, _ := jsonparser.ParseFloat(value)
-			queryValues["requests"] = v
+			queryValues["errors"] = v
 		case 11:
 			v, _ := jsonparser.ParseFloat(value)
-			queryValues["errors"] = v
+			queryValues["client_errors"] = v
 		case 12:
 			v, _ := jsonparser.ParseFloat(value)
-			queryValues["client_errors"] = v
+			queryValues["server_errors"] = v
 		case 13:
 			v, _ := jsonparser.ParseFloat(value)
-			queryValues["server_errors"] = v
+			queryValues["handler_start"] = v
 		case 14:
 			v, _ := jsonparser.ParseFloat(value)
-			queryValues["handler_start"] = v
-		case 15:
-			v, _ := jsonparser.ParseFloat(value)
 			queryValues["timeouts"] = v
-		case 16:
+		case 15:
 			v, _ := jsonparser.ParseFloat(value)
 			queryValues["total_time"] = v
 		}
 	}, paths...)
 
-	e.gaugeQuery["15min_rate_reqs_per_second"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(float64(queryValues["15min_rate_reqs_per_second"]))
-	e.gaugeQuery["5min_rate_reqs_per_second"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(float64(queryValues["5min_rate_reqs_per_second"]))
-	e.gaugeQuery["75th_pc_request_time"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(float64(queryValues["75th_pc_request_time"]))
-	e.gaugeQuery["95th_pc_request_time"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(float64(queryValues["95th_pc_request_time"]))
-	e.gaugeQuery["99th_pc_request_time"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(float64(queryValues["99th_pc_request_time"]))
-	e.gaugeQuery["999th_pc_request_time"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(float64(queryValues["999th_pc_request_time"]))
-	e.gaugeQuery["avg_requests_per_second"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(float64(queryValues["avg_requests_per_second"]))
-	e.gaugeQuery["avg_time_per_request"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(float64(queryValues["avg_time_per_request"]))
-	e.gaugeQuery["median_request_time"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(float64(queryValues["median_request_time"]))
-	e.gaugeQuery["requests"].WithLabelValues(coreName, "/select.requests", "QUERY").Set(float64(queryValues["requests"]))
-	e.gaugeQuery["errors"].WithLabelValues(coreName, "/select.errors", "QUERY").Set(float64(queryValues["errors"]))
-	e.gaugeQuery["client_errors"].WithLabelValues(coreName, "/select.clientErrors", "QUERY").Set(float64(queryValues["client_errors"]))
-	e.gaugeQuery["server_errors"].WithLabelValues(coreName, "/select.serverErrors", "QUERY").Set(float64(queryValues["server_errors"]))
-	e.gaugeQuery["handler_start"].WithLabelValues(coreName, "/select.handlerStart", "QUERY").Set(float64(queryValues["handler_start"]))
-	e.gaugeQuery["timeouts"].WithLabelValues(coreName, "/select.timeouts", "QUERY").Set(float64(queryValues["timeouts"]))
-	e.gaugeQuery["total_time"].WithLabelValues(coreName, "/select.totalTime", "QUERY").Set(float64(queryValues["total_time"]))
+	e.gaugeQuery["15min_rate_reqs_per_second"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(queryValues["15min_rate_reqs_per_second"])
+	e.gaugeQuery["5min_rate_reqs_per_second"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(queryValues["5min_rate_reqs_per_second"])
+	e.gaugeQuery["75th_pc_request_time"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(queryValues["75th_pc_request_time"])
+	e.gaugeQuery["95th_pc_request_time"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(queryValues["95th_pc_request_time"])
+	e.gaugeQuery["99th_pc_request_time"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(queryValues["99th_pc_request_time"])
+	e.gaugeQuery["999th_pc_request_time"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(queryValues["999th_pc_request_time"])
+	e.gaugeQuery["avg_requests_per_second"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(queryValues["avg_requests_per_second"])
+	e.gaugeQuery["avg_time_per_request"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(queryValues["avg_time_per_request"])
+	e.gaugeQuery["median_request_time"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(queryValues["median_request_time"])
+	e.gaugeQuery["requests"].WithLabelValues(coreName, "/select.requests", "QUERY").Set(queryValues["requests"])
+	e.gaugeQuery["errors"].WithLabelValues(coreName, "/select.errors", "QUERY").Set(queryValues["errors"])
+	e.gaugeQuery["client_errors"].WithLabelValues(coreName, "/select.clientErrors", "QUERY").Set(queryValues["client_errors"])
+	e.gaugeQuery["server_errors"].WithLabelValues(coreName, "/select.serverErrors", "QUERY").Set(queryValues["server_errors"])
+	e.gaugeQuery["handler_start"].WithLabelValues(coreName, "/select.handlerStart", "QUERY").Set(queryValues["handler_start"])
+	e.gaugeQuery["timeouts"].WithLabelValues(coreName, "/select.timeouts", "QUERY").Set(queryValues["timeouts"])
+	e.gaugeQuery["total_time"].WithLabelValues(coreName, "/select.totalTime", "QUERY").Set(queryValues["total_time"])
 
 	return errors
 }
@@ -207,7 +196,7 @@ func processUpdateMetrics(e *Exporter, coreName string, data []byte) []error {
 			updateValues["avg_time_per_update"] = v
 		case 8:
 			v, _ := jsonparser.ParseFloat(value)
-			updateValues["median_updates_time"] = v
+			updateValues["median_time_per_update"] = v
 		case 9:
 			v, _ := jsonparser.ParseFloat(value)
 			updateValues["requests"] = v
@@ -265,33 +254,33 @@ func processUpdateMetrics(e *Exporter, coreName string, data []byte) []error {
 		}
 	}, paths...)
 
-	e.gaugeQuery["15min_rate_updates_per_second"].WithLabelValues(coreName, "/update.requestTimes", "UPDATE").Set(float64(updateValues["15min_rate_updates_per_second"]))
-	e.gaugeQuery["5min_rate_updates_per_second"].WithLabelValues(coreName, "/update.requestTimes", "UPDATE").Set(float64(updateValues["5min_rate_updates_per_second"]))
-	e.gaugeQuery["75th_pc_update_time"].WithLabelValues(coreName, "/update.requestTimes", "UPDATE").Set(float64(updateValues["75th_pc_update_time"]))
-	e.gaugeQuery["95th_pc_update_time"].WithLabelValues(coreName, "/update.requestTimes", "UPDATE").Set(float64(updateValues["95th_pc_update_time"]))
-	e.gaugeQuery["99th_pc_update_time"].WithLabelValues(coreName, "/update.requestTimes", "UPDATE").Set(float64(updateValues["99th_pc_update_time"]))
-	e.gaugeQuery["999th_pc_update_time"].WithLabelValues(coreName, "/update.requestTimes", "UPDATE").Set(float64(updateValues["999th_pc_update_time"]))
-	e.gaugeQuery["avg_updates_per_second"].WithLabelValues(coreName, "/update.requestTimes", "UPDATE").Set(float64(updateValues["avg_updates_per_second"]))
-	e.gaugeQuery["avg_time_per_update"].WithLabelValues(coreName, "/update.requestTimes", "UPDATE").Set(float64(updateValues["avg_time_per_update"]))
-	e.gaugeQuery["median_updates_time"].WithLabelValues(coreName, "/update.requestTimes", "UPDATE").Set(float64(updateValues["median_updates_time"]))
-	e.gaugeQuery["requests"].WithLabelValues(coreName, "/update.requests", "UPDATE").Set(float64(updateValues["requests"]))
-	e.gaugeQuery["adds"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(float64(updateValues["adds"]))
-	e.gaugeQuery["autocommit_max_time"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(float64(updateValues["autocommit_max_time"]))
-	e.gaugeQuery["autocommits"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(float64(updateValues["autocommits"]))
-	e.gaugeQuery["commits"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(float64(updateValues["commits"]))
-	e.gaugeQuery["cumulative_adds"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(float64(updateValues["cumulative_adds"]))
-	e.gaugeQuery["cumulative_deletes_by_id"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(float64(updateValues["cumulative_deletes_by_id"]))
-	e.gaugeQuery["cumulative_deletes_by_query"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(float64(updateValues["cumulative_deletes_by_query"]))
-	e.gaugeQuery["cumulative_errors"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(float64(updateValues["cumulative_errors"]))
-	e.gaugeQuery["deletes_by_id"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(float64(updateValues["deletes_by_id"]))
-	e.gaugeQuery["deletes_by_query"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(float64(updateValues["deletes_by_query"]))
-	e.gaugeQuery["docs_pending"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(float64(updateValues["docs_pending"]))
-	e.gaugeQuery["errors"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(float64(updateValues["errors"]))
-	e.gaugeQuery["expunge_deletes"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(float64(updateValues["expunge_deletes"]))
-	e.gaugeQuery["merges"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(float64(updateValues["merges"]))
-	e.gaugeQuery["optimizes"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(float64(updateValues["optimizes"]))
-	e.gaugeQuery["rollbacks"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(float64(updateValues["rollbacks"]))
-	e.gaugeQuery["soft_autocommits"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(float64(updateValues["soft_autocommits"]))
+	e.gaugeUpdate["15min_rate_updates_per_second"].WithLabelValues(coreName, "/update.requestTimes", "UPDATE").Set(updateValues["15min_rate_updates_per_second"])
+	e.gaugeUpdate["5min_rate_updates_per_second"].WithLabelValues(coreName, "/update.requestTimes", "UPDATE").Set(updateValues["5min_rate_updates_per_second"])
+	e.gaugeUpdate["75th_pc_update_time"].WithLabelValues(coreName, "/update.requestTimes", "UPDATE").Set(updateValues["75th_pc_update_time"])
+	e.gaugeUpdate["95th_pc_update_time"].WithLabelValues(coreName, "/update.requestTimes", "UPDATE").Set(updateValues["95th_pc_update_time"])
+	e.gaugeUpdate["99th_pc_update_time"].WithLabelValues(coreName, "/update.requestTimes", "UPDATE").Set(updateValues["99th_pc_update_time"])
+	e.gaugeUpdate["999th_pc_update_time"].WithLabelValues(coreName, "/update.requestTimes", "UPDATE").Set(updateValues["999th_pc_update_time"])
+	e.gaugeUpdate["avg_updates_per_second"].WithLabelValues(coreName, "/update.requestTimes", "UPDATE").Set(updateValues["avg_updates_per_second"])
+	e.gaugeUpdate["avg_time_per_update"].WithLabelValues(coreName, "/update.requestTimes", "UPDATE").Set(updateValues["avg_time_per_update"])
+	e.gaugeUpdate["median_updates_time"].WithLabelValues(coreName, "/update.requestTimes", "UPDATE").Set(updateValues["median_updates_time"])
+	e.gaugeUpdate["requests"].WithLabelValues(coreName, "/update.requests", "UPDATE").Set(updateValues["requests"])
+	e.gaugeUpdate["adds"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(updateValues["adds"])
+	e.gaugeUpdate["autocommit_max_time"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(updateValues["autocommit_max_time"])
+	e.gaugeUpdate["autocommits"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(updateValues["autocommits"])
+	e.gaugeUpdate["commits"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(updateValues["commits"])
+	e.gaugeUpdate["cumulative_adds"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(updateValues["cumulative_adds"])
+	e.gaugeUpdate["cumulative_deletes_by_id"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(updateValues["cumulative_deletes_by_id"])
+	e.gaugeUpdate["cumulative_deletes_by_query"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(updateValues["cumulative_deletes_by_query"])
+	e.gaugeUpdate["cumulative_errors"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(updateValues["cumulative_errors"])
+	e.gaugeUpdate["deletes_by_id"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(updateValues["deletes_by_id"])
+	e.gaugeUpdate["deletes_by_query"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(updateValues["deletes_by_query"])
+	e.gaugeUpdate["docs_pending"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(updateValues["docs_pending"])
+	e.gaugeUpdate["errors"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(updateValues["errors"])
+	e.gaugeUpdate["expunge_deletes"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(updateValues["expunge_deletes"])
+	e.gaugeUpdate["merges"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(updateValues["merges"])
+	e.gaugeUpdate["optimizes"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(updateValues["optimizes"])
+	e.gaugeUpdate["rollbacks"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(updateValues["rollbacks"])
+	e.gaugeUpdate["soft_autocommits"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(updateValues["soft_autocommits"])
 
 	return errors
 }
