@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"regexp"
+
 	"github.com/buger/jsonparser"
 )
 
@@ -31,6 +33,9 @@ func processQueryMetrics(e *Exporter, coreName string, data []byte) []error {
 	}
 	metricsNode := fmt.Sprintf("solr.core.%s.%s.%s", coreMap["Collection"], coreMap["Shard"], coreMap["Replica"])
 
+	b := bytes.Replace(data, []byte(":\"NaN\""), []byte(":0.0"), -1)
+	b = bytes.Replace(b, []byte("ms\","), []byte("\","), -1)
+
 	paths := [][]string{
 		[]string{"metrics", metricsNode, "QUERY./select.requestTimes", "15minRate"},
 		[]string{"metrics", metricsNode, "QUERY./select.requestTimes", "5minRate"},
@@ -41,7 +46,7 @@ func processQueryMetrics(e *Exporter, coreName string, data []byte) []error {
 		[]string{"metrics", metricsNode, "QUERY./select.requestTimes", "meanRate"},
 		[]string{"metrics", metricsNode, "QUERY./select.requestTimes", "mean_ms"},
 		[]string{"metrics", metricsNode, "QUERY./select.requestTimes", "median_ms"},
-		[]string{"metrics", metricsNode, "QUERY./select.requests", "count"},
+		[]string{"metrics", metricsNode, "QUERY./select.requests"},
 		[]string{"metrics", metricsNode, "QUERY./select.errors", "count"},
 		[]string{"metrics", metricsNode, "QUERY./select.clientErrors", "count"},
 		[]string{"metrics", metricsNode, "QUERY./select.serverErrors", "count"},
@@ -52,7 +57,7 @@ func processQueryMetrics(e *Exporter, coreName string, data []byte) []error {
 
 	queryValues := make(map[string]float64)
 
-	jsonparser.EachKey(data, func(idx int, value []byte, vt jsonparser.ValueType, err error) {
+	jsonparser.EachKey(b, func(idx int, value []byte, vt jsonparser.ValueType, err error) {
 		switch idx {
 		case 0:
 			v, _ := jsonparser.ParseFloat(value)
@@ -113,7 +118,7 @@ func processQueryMetrics(e *Exporter, coreName string, data []byte) []error {
 	e.gaugeQuery["999th_pc_request_time"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(queryValues["999th_pc_request_time"])
 	e.gaugeQuery["avg_requests_per_second"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(queryValues["avg_requests_per_second"])
 	e.gaugeQuery["avg_time_per_request"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(queryValues["avg_time_per_request"])
-	e.gaugeQuery["median_request_time"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(queryValues["median_request_time"])
+	e.gaugeQuery["median_time_per_request"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(queryValues["median_time_per_request"])
 	e.gaugeQuery["requests"].WithLabelValues(coreName, "/select.requests", "QUERY").Set(queryValues["requests"])
 	e.gaugeQuery["errors"].WithLabelValues(coreName, "/select.errors", "QUERY").Set(queryValues["errors"])
 	e.gaugeQuery["client_errors"].WithLabelValues(coreName, "/select.clientErrors", "QUERY").Set(queryValues["client_errors"])
@@ -135,6 +140,9 @@ func processUpdateMetrics(e *Exporter, coreName string, data []byte) []error {
 		return errors
 	}
 	metricsNode := fmt.Sprintf("solr.core.%s.%s.%s", coreMap["Collection"], coreMap["Shard"], coreMap["Replica"])
+
+	b := bytes.Replace(data, []byte(":\"NaN\""), []byte(":0.0"), -1)
+	b = bytes.Replace(b, []byte("ms\","), []byte("\","), -1)
 
 	paths := [][]string{
 		[]string{"metrics", metricsNode, "UPDATE./update.requestTimes", "15minRate"},
@@ -168,7 +176,7 @@ func processUpdateMetrics(e *Exporter, coreName string, data []byte) []error {
 
 	updateValues := make(map[string]float64)
 
-	jsonparser.EachKey(data, func(idx int, value []byte, vt jsonparser.ValueType, err error) {
+	jsonparser.EachKey(b, func(idx int, value []byte, vt jsonparser.ValueType, err error) {
 		switch idx {
 		case 0:
 			v, _ := jsonparser.ParseFloat(value)
@@ -262,7 +270,7 @@ func processUpdateMetrics(e *Exporter, coreName string, data []byte) []error {
 	e.gaugeUpdate["999th_pc_update_time"].WithLabelValues(coreName, "/update.requestTimes", "UPDATE").Set(updateValues["999th_pc_update_time"])
 	e.gaugeUpdate["avg_updates_per_second"].WithLabelValues(coreName, "/update.requestTimes", "UPDATE").Set(updateValues["avg_updates_per_second"])
 	e.gaugeUpdate["avg_time_per_update"].WithLabelValues(coreName, "/update.requestTimes", "UPDATE").Set(updateValues["avg_time_per_update"])
-	e.gaugeUpdate["median_updates_time"].WithLabelValues(coreName, "/update.requestTimes", "UPDATE").Set(updateValues["median_updates_time"])
+	e.gaugeUpdate["median_time_per_update"].WithLabelValues(coreName, "/update.requestTimes", "UPDATE").Set(updateValues["median_time_per_update"])
 	e.gaugeUpdate["requests"].WithLabelValues(coreName, "/update.requests", "UPDATE").Set(updateValues["requests"])
 	e.gaugeUpdate["adds"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(updateValues["adds"])
 	e.gaugeUpdate["autocommit_max_time"].WithLabelValues(coreName, "updateHandler", "UPDATE").Set(updateValues["autocommit_max_time"])

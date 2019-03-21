@@ -1,0 +1,105 @@
+{
+    "responseHeader": {
+        "status": 0,
+        "QTime": 0
+    },
+    "initFailures": {},
+    "status": {
+        "logs_shard1_replica_n2": {
+            "name": "logs_shard1_replica_n2",
+            "instanceDir": "/data/solr/logs_shard1_replica_n2",
+            "dataDir": "/data/solr/logs_shard1_replica_n2/data/",
+            "config": "solrconfig.xml",
+            "schema": "managed-schema",
+            "startTime": "2019-03-20T14:15:38.261Z",
+            "uptime": 7075803,
+            "lastPublished": "active",
+            "configVersion": 0,
+            "cloud": {
+                "collection": "logs",
+                "shard": "shard1",
+                "replica": "core_node5"
+            },
+            "index": {
+                "numDocs": 0,
+                "maxDoc": 0,
+                "deletedDocs": 0,
+                "indexHeapUsageBytes": 0,
+                "version": 2,
+                "segmentCount": 0,
+                "current": true,
+                "hasDeletions": false,
+                "directory": "org.apache.lucene.store.NRTCachingDirectory:NRTCachingDirectory(MMapDirectory@/data/solr/logs_shard1_replica_n2/data/index lockFactory=org.apache.lucene.store.NativeFSLockFactory@5dcada31; maxCacheMB=48.0 maxMergeSizeMB=4.0)",
+                "segmentsFile": "segments_1",
+                "segmentsFileSizeInBytes": 69,
+                "userData": {},
+                "sizeInBytes": 69,
+                "size": "69 bytes"
+            }
+        },
+        "shift_shard1_replica_n3": {
+            "name": "shift_shard1_replica_n3",
+            "instanceDir": "/data/solr/shift_shard1_replica_n3",
+            "dataDir": "/data/solr/shift_shard1_replica_n3/data/",
+            "config": "solrconfig.xml",
+            "schema": "managed-schema",
+            "startTime": "2019-03-20T14:15:38.259Z",
+            "uptime": 7075805,
+            "lastPublished": "active",
+            "configVersion": 0,
+            "cloud": {
+                "collection": "shift",
+                "shard": "shard1",
+                "replica": "core_node4"
+            },
+            "index": {
+                "numDocs": 0,
+                "maxDoc": 0,
+                "deletedDocs": 0,
+                "indexHeapUsageBytes": 0,
+                "version": 2,
+                "segmentCount": 0,
+                "current": true,
+                "hasDeletions": false,
+                "directory": "org.apache.lucene.store.NRTCachingDirectory:NRTCachingDirectory(MMapDirectory@/data/solr/shift_shard1_replica_n3/data/index lockFactory=org.apache.lucene.store.NativeFSLockFactory@5dcada31; maxCacheMB=48.0 maxMergeSizeMB=4.0)",
+                "segmentsFile": "segments_1",
+                "segmentsFileSizeInBytes": 69,
+                "userData": {},
+                "sizeInBytes": 69,
+                "size": "69 bytes"
+            }
+        },
+        "shift_shard3_replica_n9": {
+            "name": "shift_shard3_replica_n9",
+            "instanceDir": "/data/solr/shift_shard3_replica_n9",
+            "dataDir": "/data/solr/shift_shard3_replica_n9/data/",
+            "config": "solrconfig.xml",
+            "schema": "managed-schema",
+            "startTime": "2019-03-20T14:15:38.256Z",
+            "uptime": 7075808,
+            "lastPublished": "active",
+            "configVersion": 0,
+            "cloud": {
+                "collection": "shift",
+                "shard": "shard3",
+                "replica": "core_node10"
+            },
+            "index": {
+                "numDocs": 0,
+                "maxDoc": 0,
+                "deletedDocs": 0,
+                "indexHeapUsageBytes": 0,
+                "version": 2,
+                "segmentCount": 0,
+                "current": true,
+                "hasDeletions": false,
+                "directory": "org.apache.lucene.store.NRTCachingDirectory:NRTCachingDirectory(MMapDirectory@/data/solr/shift_shard3_replica_n9/data/index lockFactory=org.apache.lucene.store.NativeFSLockFactory@5dcada31; maxCacheMB=48.0 maxMergeSizeMB=4.0)",
+                "segmentsFile": "segments_1",
+                "segmentsFileSizeInBytes": 69,
+                "userData": {},
+                "sizeInBytes": 69,
+                "size": "69 bytes"
+            }
+        }
+    }
+}

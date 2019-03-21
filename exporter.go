@@ -14,9 +14,9 @@ import (
 )
 
 const (
-	mbeansPath        = "/admin/mbeans?stats=true&wt=json&cat=CORE&cat=QUERY&cat=UPDATE&cat=CACHE"
-	adminCoresPath    = "/admin/cores?action=STATUS&wt=json"
-	metricsCorePath   = "/admin/metrics?group=core&prefix=QUERY,UPDATE&wt=json"
+	mbeansPath      = "/admin/mbeans?stats=true&wt=json&cat=CORE&cat=QUERY&cat=UPDATE&cat=CACHE"
+	adminCoresPath  = "/admin/cores?action=STATUS&wt=json"
+	metricsCorePath = "/admin/metrics?group=core&prefix=QUERY,UPDATE&wt=json"
 )
 
 var (
@@ -107,10 +107,10 @@ func getCoresFromStatus(adminCoresStatus *AdminCoresStatus) []string {
 // Exporter collects Solr stats from the given server and exports
 // them using the prometheus metrics package.
 type Exporter struct {
-	mBeansURL        string
-	adminCoreURL     string
-	metricsURL       string
-	mutex        		 sync.RWMutex
+	mBeansURL    string
+	adminCoreURL string
+	metricsURL   string
+	mutex        sync.RWMutex
 
 	up prometheus.Gauge
 
@@ -170,15 +170,15 @@ func NewExporter(solrBaseURL string, timeout time.Duration, solrExcludedCore str
 		}, []string{"core", "handler", "class"})
 	}
 
-	mBeansURL        := fmt.Sprintf("%s%s%s", solrBaseURL, "%s", mbeansPath)
-	adminCoreURL     := fmt.Sprintf("%s%s", solrBaseURL, adminCoresPath)
-	metricsURL       := fmt.Sprintf("%s%s", solrBaseURL, metricsCorePath)
+	mBeansURL := fmt.Sprintf("%s%s%s", solrBaseURL, "%s", mbeansPath)
+	adminCoreURL := fmt.Sprintf("%s%s", solrBaseURL, adminCoresPath)
+	metricsURL := fmt.Sprintf("%s%s", solrBaseURL, metricsCorePath)
 
 	// Init our exporter.
 	return &Exporter{
-		mBeansURL:        mBeansURL,
-		adminCoreURL:     adminCoreURL,
-		metricsURL:       metricsURL,
+		mBeansURL:    mBeansURL,
+		adminCoreURL: adminCoreURL,
+		metricsURL:   metricsURL,
 
 		up: prometheus.NewGauge(prometheus.GaugeOpts{
 			Namespace: namespace,
@@ -316,7 +316,13 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 			return
 		}
 
-		errors := processMbeans(e, coreName, mBeansURLResp.Body)
+		mBeansBody, err := ioutil.ReadAll(mBeansURLResp.Body)
+		if err != nil {
+			log.Errorf("Failed to read Solr mbeans response body: %v", err)
+			return
+		}
+
+		errors := processMbeans(e, coreName, mBeansBody)
 		for _, err := range errors {
 			log.Error(err)
 		}
