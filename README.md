@@ -5,7 +5,7 @@
 
 ### WARNING: This is a fork of the original noony project... but refactored to support Solr 7+ and up. This was due to the requirement of using this in a large production environment and not being able to support older versions.
 
-Prometheus exporter for various metrics about Solr, written in Go.
+Prometheus exporter for various metrics about Solr, written in Go. This specific implemenation has been tested for SolrCloud mode only. This should work in standalone, but YMMV.
 
 ### Installation
 
