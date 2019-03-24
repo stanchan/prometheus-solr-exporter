@@ -33,14 +33,14 @@ func processMbeans(e *Exporter, coreName string, data []byte) []error {
 }
 
 func handleCoreMbeans(data []byte, e *Exporter, coreName string, index int) []error {
+	coreIdx := fmt.Sprintf("[%d]", index)
 	coreValues := make(map[string]float64)
 	errors := []error{}
-	idx := fmt.Sprintf("[%s]", index)
 
 	paths := [][]string{
-		[]string{"solr-mbeans", idx, "searcher", "stats", "SEARCHER.searcher.deletedDocs"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "SEARCHER.searcher.maxDoc"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "SEARCHER.searcher.numDocs"},
+		[]string{"solr-mbeans", coreIdx, "searcher", "stats", "SEARCHER.searcher.deletedDocs"},
+		[]string{"solr-mbeans", coreIdx, "searcher", "stats", "SEARCHER.searcher.maxDoc"},
+		[]string{"solr-mbeans", coreIdx, "searcher", "stats", "SEARCHER.searcher.numDocs"},
 	}
 
 	jsonparser.EachKey(data, func(idx int, value []byte, vt jsonparser.ValueType, err error) {
@@ -65,7 +65,7 @@ func handleCoreMbeans(data []byte, e *Exporter, coreName string, index int) []er
 }
 
 func handleCacheMbeans(data []byte, e *Exporter, coreName string, index int) []error {
-	idx := fmt.Sprintf("[%s]", index)
+	cacheIdx := fmt.Sprintf("[%d]", index)
 	cacheValues := map[string]map[string]float64{
 		"perSegFilter":     map[string]float64{},
 		"queryResultCache": map[string]float64{},
@@ -76,66 +76,66 @@ func handleCacheMbeans(data []byte, e *Exporter, coreName string, index int) []e
 	errors := []error{}
 
 	paths := [][]string{
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.perSegFilter.lookups"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.perSegFilter.hits"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.perSegFilter.hitratio"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.perSegFilter.warmupTime"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.perSegFilter.cumulative_lookups"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.perSegFilter.cumulative_inserts"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.perSegFilter.cumulative_hitratio"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.perSegFilter.size"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.perSegFilter.evictions"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.perSegFilter.cumulative_hits"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.perSegFilter.cumulative_evictions"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.perSegFilter.inserts"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.queryResultCache.lookups"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.queryResultCache.hits"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.queryResultCache.hitratio"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.queryResultCache.warmupTime"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.queryResultCache.cumulative_lookups"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.queryResultCache.cumulative_inserts"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.queryResultCache.cumulative_hitratio"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.queryResultCache.size"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.queryResultCache.evictions"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.queryResultCache.cumulative_hits"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.queryResultCache.cumulative_evictions"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.queryResultCache.inserts"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.fieldValueCache.lookups"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.fieldValueCache.hits"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.fieldValueCache.hitratio"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.fieldValueCache.warmupTime"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.fieldValueCache.cumulative_lookups"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.fieldValueCache.cumulative_inserts"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.fieldValueCache.cumulative_hitratio"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.fieldValueCache.size"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.fieldValueCache.evictions"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.fieldValueCache.cumulative_hits"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.fieldValueCache.cumulative_evictions"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.fieldValueCache.inserts"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.filterCache.lookups"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.filterCache.hits"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.filterCache.hitratio"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.filterCache.warmupTime"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.filterCache.cumulative_lookups"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.filterCache.cumulative_inserts"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.filterCache.cumulative_hitratio"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.filterCache.size"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.filterCache.evictions"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.filterCache.cumulative_hits"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.filterCache.cumulative_evictions"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.filterCache.inserts"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.documentCache.lookups"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.documentCache.hits"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.documentCache.hitratio"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.documentCache.warmupTime"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.documentCache.cumulative_lookups"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.documentCache.cumulative_inserts"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.documentCache.cumulative_hitratio"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.documentCache.size"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.documentCache.evictions"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.documentCache.cumulative_hits"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.documentCache.cumulative_evictions"},
-		[]string{"solr-mbeans", idx, "searcher", "stats", "CACHE.searcher.documentCache.inserts"},
+		[]string{"solr-mbeans", cacheIdx, "perSegFilter", "stats", "CACHE.searcher.perSegFilter.lookups"},
+		[]string{"solr-mbeans", cacheIdx, "perSegFilter", "stats", "CACHE.searcher.perSegFilter.hits"},
+		[]string{"solr-mbeans", cacheIdx, "perSegFilter", "stats", "CACHE.searcher.perSegFilter.hitratio"},
+		[]string{"solr-mbeans", cacheIdx, "perSegFilter", "stats", "CACHE.searcher.perSegFilter.warmupTime"},
+		[]string{"solr-mbeans", cacheIdx, "perSegFilter", "stats", "CACHE.searcher.perSegFilter.cumulative_lookups"},
+		[]string{"solr-mbeans", cacheIdx, "perSegFilter", "stats", "CACHE.searcher.perSegFilter.cumulative_inserts"},
+		[]string{"solr-mbeans", cacheIdx, "perSegFilter", "stats", "CACHE.searcher.perSegFilter.cumulative_hitratio"},
+		[]string{"solr-mbeans", cacheIdx, "perSegFilter", "stats", "CACHE.searcher.perSegFilter.size"},
+		[]string{"solr-mbeans", cacheIdx, "perSegFilter", "stats", "CACHE.searcher.perSegFilter.evictions"},
+		[]string{"solr-mbeans", cacheIdx, "perSegFilter", "stats", "CACHE.searcher.perSegFilter.cumulative_hits"},
+		[]string{"solr-mbeans", cacheIdx, "perSegFilter", "stats", "CACHE.searcher.perSegFilter.cumulative_evictions"},
+		[]string{"solr-mbeans", cacheIdx, "perSegFilter", "stats", "CACHE.searcher.perSegFilter.inserts"},
+		[]string{"solr-mbeans", cacheIdx, "queryResultCache", "stats", "CACHE.searcher.queryResultCache.lookups"},
+		[]string{"solr-mbeans", cacheIdx, "queryResultCache", "stats", "CACHE.searcher.queryResultCache.hits"},
+		[]string{"solr-mbeans", cacheIdx, "queryResultCache", "stats", "CACHE.searcher.queryResultCache.hitratio"},
+		[]string{"solr-mbeans", cacheIdx, "queryResultCache", "stats", "CACHE.searcher.queryResultCache.warmupTime"},
+		[]string{"solr-mbeans", cacheIdx, "queryResultCache", "stats", "CACHE.searcher.queryResultCache.cumulative_lookups"},
+		[]string{"solr-mbeans", cacheIdx, "queryResultCache", "stats", "CACHE.searcher.queryResultCache.cumulative_inserts"},
+		[]string{"solr-mbeans", cacheIdx, "queryResultCache", "stats", "CACHE.searcher.queryResultCache.cumulative_hitratio"},
+		[]string{"solr-mbeans", cacheIdx, "queryResultCache", "stats", "CACHE.searcher.queryResultCache.size"},
+		[]string{"solr-mbeans", cacheIdx, "queryResultCache", "stats", "CACHE.searcher.queryResultCache.evictions"},
+		[]string{"solr-mbeans", cacheIdx, "queryResultCache", "stats", "CACHE.searcher.queryResultCache.cumulative_hits"},
+		[]string{"solr-mbeans", cacheIdx, "queryResultCache", "stats", "CACHE.searcher.queryResultCache.cumulative_evictions"},
+		[]string{"solr-mbeans", cacheIdx, "queryResultCache", "stats", "CACHE.searcher.queryResultCache.inserts"},
+		[]string{"solr-mbeans", cacheIdx, "fieldValueCache", "stats", "CACHE.searcher.fieldValueCache.lookups"},
+		[]string{"solr-mbeans", cacheIdx, "fieldValueCache", "stats", "CACHE.searcher.fieldValueCache.hits"},
+		[]string{"solr-mbeans", cacheIdx, "fieldValueCache", "stats", "CACHE.searcher.fieldValueCache.hitratio"},
+		[]string{"solr-mbeans", cacheIdx, "fieldValueCache", "stats", "CACHE.searcher.fieldValueCache.warmupTime"},
+		[]string{"solr-mbeans", cacheIdx, "fieldValueCache", "stats", "CACHE.searcher.fieldValueCache.cumulative_lookups"},
+		[]string{"solr-mbeans", cacheIdx, "fieldValueCache", "stats", "CACHE.searcher.fieldValueCache.cumulative_inserts"},
+		[]string{"solr-mbeans", cacheIdx, "fieldValueCache", "stats", "CACHE.searcher.fieldValueCache.cumulative_hitratio"},
+		[]string{"solr-mbeans", cacheIdx, "fieldValueCache", "stats", "CACHE.searcher.fieldValueCache.size"},
+		[]string{"solr-mbeans", cacheIdx, "fieldValueCache", "stats", "CACHE.searcher.fieldValueCache.evictions"},
+		[]string{"solr-mbeans", cacheIdx, "fieldValueCache", "stats", "CACHE.searcher.fieldValueCache.cumulative_hits"},
+		[]string{"solr-mbeans", cacheIdx, "fieldValueCache", "stats", "CACHE.searcher.fieldValueCache.cumulative_evictions"},
+		[]string{"solr-mbeans", cacheIdx, "fieldValueCache", "stats", "CACHE.searcher.fieldValueCache.inserts"},
+		[]string{"solr-mbeans", cacheIdx, "filterCache", "stats", "CACHE.searcher.filterCache.lookups"},
+		[]string{"solr-mbeans", cacheIdx, "filterCache", "stats", "CACHE.searcher.filterCache.hits"},
+		[]string{"solr-mbeans", cacheIdx, "filterCache", "stats", "CACHE.searcher.filterCache.hitratio"},
+		[]string{"solr-mbeans", cacheIdx, "filterCache", "stats", "CACHE.searcher.filterCache.warmupTime"},
+		[]string{"solr-mbeans", cacheIdx, "filterCache", "stats", "CACHE.searcher.filterCache.cumulative_lookups"},
+		[]string{"solr-mbeans", cacheIdx, "filterCache", "stats", "CACHE.searcher.filterCache.cumulative_inserts"},
+		[]string{"solr-mbeans", cacheIdx, "filterCache", "stats", "CACHE.searcher.filterCache.cumulative_hitratio"},
+		[]string{"solr-mbeans", cacheIdx, "filterCache", "stats", "CACHE.searcher.filterCache.size"},
+		[]string{"solr-mbeans", cacheIdx, "filterCache", "stats", "CACHE.searcher.filterCache.evictions"},
+		[]string{"solr-mbeans", cacheIdx, "filterCache", "stats", "CACHE.searcher.filterCache.cumulative_hits"},
+		[]string{"solr-mbeans", cacheIdx, "filterCache", "stats", "CACHE.searcher.filterCache.cumulative_evictions"},
+		[]string{"solr-mbeans", cacheIdx, "filterCache", "stats", "CACHE.searcher.filterCache.inserts"},
+		[]string{"solr-mbeans", cacheIdx, "documentCache", "stats", "CACHE.searcher.documentCache.lookups"},
+		[]string{"solr-mbeans", cacheIdx, "documentCache", "stats", "CACHE.searcher.documentCache.hits"},
+		[]string{"solr-mbeans", cacheIdx, "documentCache", "stats", "CACHE.searcher.documentCache.hitratio"},
+		[]string{"solr-mbeans", cacheIdx, "documentCache", "stats", "CACHE.searcher.documentCache.warmupTime"},
+		[]string{"solr-mbeans", cacheIdx, "documentCache", "stats", "CACHE.searcher.documentCache.cumulative_lookups"},
+		[]string{"solr-mbeans", cacheIdx, "documentCache", "stats", "CACHE.searcher.documentCache.cumulative_inserts"},
+		[]string{"solr-mbeans", cacheIdx, "documentCache", "stats", "CACHE.searcher.documentCache.cumulative_hitratio"},
+		[]string{"solr-mbeans", cacheIdx, "documentCache", "stats", "CACHE.searcher.documentCache.size"},
+		[]string{"solr-mbeans", cacheIdx, "documentCache", "stats", "CACHE.searcher.documentCache.evictions"},
+		[]string{"solr-mbeans", cacheIdx, "documentCache", "stats", "CACHE.searcher.documentCache.cumulative_hits"},
+		[]string{"solr-mbeans", cacheIdx, "documentCache", "stats", "CACHE.searcher.documentCache.cumulative_evictions"},
+		[]string{"solr-mbeans", cacheIdx, "documentCache", "stats", "CACHE.searcher.documentCache.inserts"},
 	}
 
 	jsonparser.EachKey(data, func(idx int, value []byte, vt jsonparser.ValueType, err error) {
@@ -151,7 +151,7 @@ func handleCacheMbeans(data []byte, e *Exporter, coreName string, index int) []e
 			cacheValues["perSegFilter"]["hitratio"] = v
 		case 3:
 			v, _ := jsonparser.ParseFloat(value)
-			cacheValues["perSegFilter"]["warmupTime"] = v
+			cacheValues["perSegFilter"]["warmup_time"] = v
 		case 4:
 			v, _ := jsonparser.ParseFloat(value)
 			cacheValues["perSegFilter"]["cumulative_lookups"] = v
@@ -187,7 +187,7 @@ func handleCacheMbeans(data []byte, e *Exporter, coreName string, index int) []e
 			cacheValues["queryResultCache"]["hitratio"] = v
 		case 15:
 			v, _ := jsonparser.ParseFloat(value)
-			cacheValues["queryResultCache"]["warmupTime"] = v
+			cacheValues["queryResultCache"]["warmup_time"] = v
 		case 16:
 			v, _ := jsonparser.ParseFloat(value)
 			cacheValues["queryResultCache"]["cumulative_lookups"] = v
@@ -223,7 +223,7 @@ func handleCacheMbeans(data []byte, e *Exporter, coreName string, index int) []e
 			cacheValues["fieldValueCache"]["hitratio"] = v
 		case 27:
 			v, _ := jsonparser.ParseFloat(value)
-			cacheValues["fieldValueCache"]["warmupTime"] = v
+			cacheValues["fieldValueCache"]["warmup_time"] = v
 		case 28:
 			v, _ := jsonparser.ParseFloat(value)
 			cacheValues["fieldValueCache"]["cumulative_lookups"] = v
@@ -259,7 +259,7 @@ func handleCacheMbeans(data []byte, e *Exporter, coreName string, index int) []e
 			cacheValues["filterCache"]["hitratio"] = v
 		case 39:
 			v, _ := jsonparser.ParseFloat(value)
-			cacheValues["filterCache"]["warmupTime"] = v
+			cacheValues["filterCache"]["warmup_time"] = v
 		case 40:
 			v, _ := jsonparser.ParseFloat(value)
 			cacheValues["filterCache"]["cumulative_lookups"] = v
@@ -295,7 +295,7 @@ func handleCacheMbeans(data []byte, e *Exporter, coreName string, index int) []e
 			cacheValues["documentCache"]["hitratio"] = v
 		case 51:
 			v, _ := jsonparser.ParseFloat(value)
-			cacheValues["documentCache"]["warmupTime"] = v
+			cacheValues["documentCache"]["warmup_time"] = v
 		case 52:
 			v, _ := jsonparser.ParseFloat(value)
 			cacheValues["documentCache"]["cumulative_lookups"] = v
@@ -323,23 +323,22 @@ func handleCacheMbeans(data []byte, e *Exporter, coreName string, index int) []e
 		}
 	}, paths...)
 
+	//fmt.Printf("Processing Cache Metrics!: %#v\n", cacheValues)
+
 	for element := range cacheValues {
-		for subelement := range cacheValues[element] {
-			name := fmt.Sprintf("%s.%s", "searcher", "element")
-			fmt.Printf(" (%s) %s => %s\n", element, subelement, cacheValues[element][subelement])
-			e.gaugeCache["lookups"].WithLabelValues(coreName, name, "CACHE").Set(cacheValues[element][subelement])
-			e.gaugeCache["hits"].WithLabelValues(coreName, name, "CACHE").Set(cacheValues[element][subelement])
-			e.gaugeCache["hitratio"].WithLabelValues(coreName, name, "CACHE").Set(cacheValues[element][subelement])
-			e.gaugeCache["warmup_time"].WithLabelValues(coreName, name, "CACHE").Set(cacheValues[element][subelement])
-			e.gaugeCache["cumulative_lookups"].WithLabelValues(coreName, name, "CACHE").Set(cacheValues[element][subelement])
-			e.gaugeCache["cumulative_inserts"].WithLabelValues(coreName, name, "CACHE").Set(cacheValues[element][subelement])
-			e.gaugeCache["cumulative_hitratio"].WithLabelValues(coreName, name, "CACHE").Set(cacheValues[element][subelement])
-			e.gaugeCache["size"].WithLabelValues(coreName, name, "CACHE").Set(cacheValues[element][subelement])
-			e.gaugeCache["evictions"].WithLabelValues(coreName, name, "CACHE").Set(cacheValues[element][subelement])
-			e.gaugeCache["cumulative_hits"].WithLabelValues(coreName, name, "CACHE").Set(cacheValues[element][subelement])
-			e.gaugeCache["cumulative_evictions"].WithLabelValues(coreName, name, "CACHE").Set(cacheValues[element][subelement])
-			e.gaugeCache["inserts"].WithLabelValues(coreName, name, "CACHE").Set(cacheValues[element][subelement])
-		}
+		name := fmt.Sprintf("%s.%s", "searcher", element)
+		e.gaugeCache["lookups"].WithLabelValues(coreName, name, "CACHE").Set(cacheValues[element]["lookups"])
+		e.gaugeCache["hits"].WithLabelValues(coreName, name, "CACHE").Set(cacheValues[element]["hits"])
+		e.gaugeCache["hitratio"].WithLabelValues(coreName, name, "CACHE").Set(cacheValues[element]["hitratio"])
+		e.gaugeCache["warmup_time"].WithLabelValues(coreName, name, "CACHE").Set(cacheValues[element]["warmup_time"])
+		e.gaugeCache["cumulative_lookups"].WithLabelValues(coreName, name, "CACHE").Set(cacheValues[element]["cumulative_lookups"])
+		e.gaugeCache["cumulative_inserts"].WithLabelValues(coreName, name, "CACHE").Set(cacheValues[element]["cumulative_inserts"])
+		e.gaugeCache["cumulative_hitratio"].WithLabelValues(coreName, name, "CACHE").Set(cacheValues[element]["cumulative_hitratio"])
+		e.gaugeCache["size"].WithLabelValues(coreName, name, "CACHE").Set(cacheValues[element]["size"])
+		e.gaugeCache["evictions"].WithLabelValues(coreName, name, "CACHE").Set(cacheValues[element]["evictions"])
+		e.gaugeCache["cumulative_hits"].WithLabelValues(coreName, name, "CACHE").Set(cacheValues[element]["cumulative_hits"])
+		e.gaugeCache["cumulative_evictions"].WithLabelValues(coreName, name, "CACHE").Set(cacheValues[element]["cumulative_evictions"])
+		e.gaugeCache["inserts"].WithLabelValues(coreName, name, "CACHE").Set(cacheValues[element]["inserts"])
 	}
 	return errors
 }

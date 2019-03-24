@@ -110,6 +110,8 @@ func processQueryMetrics(e *Exporter, coreName string, data []byte) []error {
 		}
 	}, paths...)
 
+	//fmt.Printf("Processing Query Metrics!: %#v\n", queryValues)
+
 	e.gaugeQuery["15min_rate_reqs_per_second"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(queryValues["15min_rate_reqs_per_second"])
 	e.gaugeQuery["5min_rate_reqs_per_second"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(queryValues["5min_rate_reqs_per_second"])
 	e.gaugeQuery["75th_pc_request_time"].WithLabelValues(coreName, "/select.requestTimes", "QUERY").Set(queryValues["75th_pc_request_time"])
@@ -261,6 +263,8 @@ func processUpdateMetrics(e *Exporter, coreName string, data []byte) []error {
 			updateValues["soft_autocommits"] = v
 		}
 	}, paths...)
+
+	//fmt.Printf("Processing Update Metrics!: %#v\n", updateValues)
 
 	e.gaugeUpdate["15min_rate_updates_per_second"].WithLabelValues(coreName, "/update.requestTimes", "UPDATE").Set(updateValues["15min_rate_updates_per_second"])
 	e.gaugeUpdate["5min_rate_updates_per_second"].WithLabelValues(coreName, "/update.requestTimes", "UPDATE").Set(updateValues["5min_rate_updates_per_second"])
